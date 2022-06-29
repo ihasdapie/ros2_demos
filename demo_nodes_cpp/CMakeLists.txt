@@ -18,7 +18,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(rcutils)
 find_package(rmw REQUIRED)
 find_package(std_msgs REQUIRED)
-
+find_package(rosidl_typesupport_introspection_c)
 include_directories(include)
 
 function(custom_executable subfolder target)
@@ -38,6 +38,7 @@ function(add_demo_dependencies library)
   ament_target_dependencies(${library}
     "example_interfaces"
     "rclcpp"
+    "rosidl_typesupport_introspection_c"
     "rclcpp_components"
     "rcutils"
     "std_msgs")

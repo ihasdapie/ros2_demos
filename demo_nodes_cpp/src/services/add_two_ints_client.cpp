@@ -63,11 +63,17 @@ int main(int argc, char ** argv)
 
   // TODO(wjwwood): make it like `client->send_request(node, request)->sum`
   // TODO(wjwwood): consider error condition
-  auto result = send_request(node, client, request);
-  if (result) {
-    RCLCPP_INFO_STREAM(node->get_logger(), "Result of add_two_ints: " << result->sum);
-  } else {
-    RCLCPP_ERROR(node->get_logger(), "Interrupted while waiting for response. Exiting.");
+
+  while (true) {
+
+    auto result = send_request(node, client, request);
+    if (result) {
+      RCLCPP_INFO_STREAM(node->get_logger(), "Result of add_two_ints: " << result->sum);
+    } else {
+      RCLCPP_ERROR(node->get_logger(), "Interrupted while waiting for response. Exiting.");
+    }
+
+    std::this_thread::sleep_for(1s);
   }
 
   rclcpp::shutdown();
