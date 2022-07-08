@@ -13,9 +13,13 @@
 // limitations under the License.
 
 #include <chrono>
+#include <iostream>
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+
+#include "rcl/introspection.h"
+
 
 #include "example_interfaces/srv/add_two_ints.hpp"
 
@@ -64,7 +68,10 @@ int main(int argc, char ** argv)
   // TODO(wjwwood): make it like `client->send_request(node, request)->sum`
   // TODO(wjwwood): consider error condition
 
+  int i = 0;
+
   while (true) {
+    i ++;
 
     auto result = send_request(node, client, request);
     if (result) {
@@ -72,6 +79,28 @@ int main(int argc, char ** argv)
     } else {
       RCLCPP_ERROR(node->get_logger(), "Interrupted while waiting for response. Exiting.");
     }
+
+    // rcl_client_t * rcl_client  = client->get_client_handle().get();
+    std::shared_ptr<rcl_client_t> rcl_client_ptr = client->get_client_handle();
+    rcl_node_t * node_ptr = node->get_node_base_interface()->get_rcl_node_handle();
+
+    // test enable/disable service events & content
+    if (i%2 == 0) {
+      // rcl_service_introspection_enable_client_content(rcl_client_ptr.get());
+      rcl_service_introspection_disable_client_events(rcl_client_ptr.get(), node_ptr);
+      RCLCPP_INFO(node->get_logger(), "Disabled client entirely");
+    } else {
+      // rcl_service_introspection_disable_client_content(rcl_client_ptr.get());
+      rcl_service_introspection_enable_client_events(rcl_client_ptr.get(), node_ptr);
+      RCLCPP_INFO(node->get_logger(), "Enabled client entirely");
+    }
+
+
+
+
+
+
+
 
     std::this_thread::sleep_for(1s);
   }
